@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>AI Character Generator | Free Online Novel Game Anime Character Maker</title>
+    <meta name="description" content="Professional AI character generator to create novel characters, game NPCs, anime avatars. Mass style templates, no login free trial, export high-res character art without watermark.">
+    <meta name="keywords" content="AI character generator, free AI character creator, novel AI character maker, game character design AI">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+        }
+        /* 全局渐变背景 */
+        body {
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f0ff 50%, #f0f7ff 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 顶部横幅 */
+        header {
+            background: linear-gradient(135deg, #4285f4 0%, #7b61ff 100%);
+            color: #fff;
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        h1 {
+            font-size: 42px;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+        }
+        .sub-title {
+            font-size: 18px;
+            opacity: 0.92;
+            margin-bottom: 35px;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 1;
+        }
+        .btn-main {
+            display: inline-block;
+            background: #fff;
+            color: #4285f4;
+            padding: 16px 48px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .btn-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+        }
+
+        /* 工具面板 */
+        .tool-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 45px;
+            margin: -50px auto 70px;
+            box-shadow: 0 15px 40px rgba(66, 133, 244, 0.12);
+            position: relative;
+            z-index: 2;
+        }
+        .tool-row {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        .tool-col {
+            flex: 1;
+            min-width: 280px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 15px;
+        }
+        textarea, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+        textarea:focus, select:focus {
+            outline: none;
+            border-color: #4285f4;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        .template-tips {
+            background: linear-gradient(90deg, #eef5ff, #f0f0ff);
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin: 12px 0 24px;
+            color: #2b60c9;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid #4285f4;
+        }
+        .template-tips:hover {
+            background: linear-gradient(90deg, #e0ecff, #e6e6ff);
+            transform: translateX(2px);
+        }
+        .gen-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4285f4, #7b61ff);
+            color: #fff;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px rgba(66, 133, 244, 0.25);
+        }
+        .gen-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(66, 133, 244, 0.35);
+        }
+        .gen-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* 结果区域 */
+        .result-area {
+            margin-top: 35px;
+            border-top: 1px solid #eee;
+            padding-top: 35px;
+            display: none;
+        }
+        .result-img-wrap {
+            width: 100%;
+            min-height: 420px;
+            border-radius: 12px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        .result-img-wrap img {
+            width: 100%;
+            max-height: 620px;
+            object-fit: contain;
+            display: none;
+            border-radius: 12px;
+        }
+        .loading {
+            color: #4b5563;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .loading span {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            border: 3px solid #4285f4;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .action-btns {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+        .action-btns button {
+            padding: 11px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background: #4285f4;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #3367d6;
+        }
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        .error-tip {
+            color: #d93025;
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+            padding: 10px 14px;
+            background: #fef2f2;
+            border-radius: 8px;
+            border-left: 3px solid #ef4444;
+        }
+
+        /* 通用板块 */
+        .section {
+            padding: 70px 0;
+        }
+        h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 50px;
+            color: #1f2937;
+            font-weight: 700;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 28px;
+        }
+        .card {
+            background: #fff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(66, 133, 244, 0.12);
+        }
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 14px;
+            color: #4285f4;
+            font-weight: 600;
+        }
+
+        /* 优势板块 */
+        .advantage {
+            background: linear-gradient(180deg, rgba(240,244,255,0.5), rgba(245,240,255,0.5));
+        }
+        .adv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+        .adv-item {
+            background: #fff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .adv-item:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        .adv-item h4 {
+            font-size: 17px;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+
+        /* 案例展示 */
+        .case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 22px;
+        }
+        .case-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .case-item:hover {
+            transform: translateY(-4px);
+        }
+        .case-item .case-img {
+            width: 100%;
+            height: 280px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .case-item:hover .case-img {
+            box-shadow: 0 8px 22px rgba(66, 133, 244, 0.18);
+        }
+        .case-item p {
+            text-align: center;
+            font-size: 14px;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        /* FAQ */
+        .faq {
+            background: #fff;
+            border-radius: 20px;
+            margin: 0 auto;
+            max-width: 900px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+            padding: 60px 50px;
+        }
+        .faq-item {
+            margin-bottom: 24px;
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 24px;
+        }
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .faq h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        /* 底部 */
+        footer {
+            background: #1f2937;
+            color: #d1d5db;
+            padding: 60px 0;
+            margin-top: 50px;
+        }
+        footer h3 {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .footer-link {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .footer-link a {
+            color: #93c5fd;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer-link a:hover {
+            color: #bfdbfe;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 顶部横幅 -->
+<header>
+    <div class="container">
+        <h1>AI Character Generator</h1>
+        <p class="sub-title">Create novel protagonists, game NPCs & anime characters in one click. High-res character art, free trial without login required.</p>
+        <a href="#tool" class="btn-main">Generate Character For Free Now</a>
+    </div>
+</header>
+
+<!-- 核心工具区 -->
+<div class="container">
+    <div id="tool" class="tool-box">
+        <h2 style="margin-bottom: 25px; font-size: 26px; text-align: left; color: #1f2937;">Online AI Character Creator Dashboard</h2>
+        
+        <div class="template-tips" onclick="fillTemplate()">
+            💡 Click to use template: Xianxia Novel Male Lead (auto-fill professional prompt)
+        </div>
+
+        <div class="tool-row">
+            <div class="tool-col">
+                <label for="prompt">Character Text Prompt</label>
+                <textarea id="prompt" placeholder="Describe your character: gender, age, outfit, personality, backstory, art style..."></textarea>
+            </div>
+            <div class="tool-col">
+                <label for="style">Art Style Selection</label>
+                <select id="style">
+                    <option value="anime, japanese anime style, detailed">Japanese Anime</option>
+                    <option value="xianxia, chinese traditional style, fantasy, detailed">Chinese Xianxia</option>
+                    <option value="cyberpunk, realistic, sci-fi, futuristic, detailed">Cyberpunk Realism</option>
+                    <option value="chibi, cute cartoon, kawaii, detailed">Cute Chibi Cartoon</option>
+                    <option value="game concept art, oil painting, realistic, detailed">Game Concept Art</option>
+                    <option value="watercolor, hand drawn, soft, detailed">Watercolor Hand Drawn</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="tool-row">
+            <div class="tool-col">
+                <label for="scenario">Usage Scenario</label>
+                <select id="scenario">
+                    <option value="full body character, detailed background">Web Novel Character</option>
+                    <option value="game NPC, full body, detailed design">Indie Game NPC / Protagonist</option>
+                    <option value="manga style character, detailed">Manga & Comic Character</option>
+                    <option value="portrait avatar, detailed face">Tabletop Game Avatar</option>
+                    <option value="virtual streamer portrait, detailed">Virtual Streamer Avatar</option>
+                </select>
+            </div>
+            <div class="tool-col">
+                <label for="size">Image Resolution</label>
+                <select id="size">
+                    <option value="768x1024">HD Standard 768×1024</option>
+                    <option value="1024x1408">Ultra HD 1024×1408</option>
+                    <option value="512x512">Square Avatar 512×512</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="gen-btn" id="generateBtn">Generate AI Character Art</button>
+        <div class="error-tip" id="errorTip"></div>
+
+        <!-- 结果预览区 -->
+        <div class="result-area" id="resultArea">
+            <h3 style="margin-bottom: 18px; color: #16a34a;">✅ Generation Complete · Character Preview</h3>
+            <div class="result-img-wrap">
+                <div class="loading" id="loadingText">Generating your character, please wait...<span></span></div>
+                <img id="resultImg" alt="AI Generated Character">
+            </div>
+            <p>High-resolution AI character art generated from your description</p>
+            <div class="action-btns">
+                <button class="btn-primary" id="downloadBtn">Download Image</button>
+                <button class="btn-secondary" id="regenerateBtn">Regenerate New Character</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 适用人群 -->
+<section class="section">
+    <div class="container">
+        <h2>Tailored For 3 Creator Groups</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>Novel Writers · Character Profiles</h3>
+                <p>Built for web & print novel authors. Generate character art for xianxia, apocalypse, urban, fantasy genres to perfectly match your story characters.</p>
+            </div>
+            <div class="card">
+                <h3>Game Devs · Game Assets</h3>
+                <p>Ideal for indie mobile/PC/tabletop games. Create heroes, NPCs, monsters, mechs & fantasy races with professional concept-art quality.</p>
+            </div>
+            <div class="card">
+                <h3>Illustrators · Anime Art</h3>
+                <p>Get reference sketches and full colored character sheets to cut down manual drafting time. Supports multiple mainstream art styles.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 平台优势 -->
+<section class="section advantage">
+    <div class="container">
+        <h2>Why Choose Our AI Character Generator</h2>
+        <div class="adv-grid">
+            <div class="adv-item">
+                <h4>✅ Free & No Sign-Up</h4>
+                <p>No registration required, generate characters instantly right after opening the page.</p>
+            </div>
+            <div class="adv-item">
+                <h4>✅ Ready-to-Use Templates</h4>
+                <p>Built-in professional character templates, no need to write complex AI prompts manually.</p>
+            </div>
+            <div class="adv-item">
+                <h4>✅ HD No Watermark</h4>
+                <p>All generated images are high resolution with no built-in watermark.</p>
+            </div>
+            <div class="adv-item">
+                <h4>✅ Multiple Art Styles</h4>
+                <p>Supports anime, xianxia, cyberpunk, chibi, concept art and other mainstream styles.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 案例展示（全部填充对应风格示例图） -->
+<section class="section">
+    <div class="container">
+        <h2>AI Character Generated Samples</h2>
+        <div class="case-grid">
+            <div class="case-item">
+                <img class="case-img" src="https://image.pollinations.ai/prompt/chinese%20xianxia%20male%20cultivator,%20white%20robe,%20long%20black%20hair,%20fantasy%20anime%20style?width=600&height=800&model=turbo&nologo=true" alt="Xianxia Fantasy Male Character" onerror="this.src='https://picsum.photos/600/800?random=1'">
+                <p>Chinese Wuxia Xianxia Hero</p>
+            </div>
+            <div class="case-item">
+                <img class="case-img" src="https://image.pollinations.ai/prompt/cyberpunk%20mech%20warrior,%20sci-fi%20futuristic%20armor,%20realistic%20game%20style?width=600&height=800&model=turbo&nologo=true" alt="Cyberpunk Mech Warrior" onerror="this.src='https://picsum.photos/600/800?random=2'">
+                <p>Video Game Playable Character</p>
+            </div>
+            <div class="case-item">
+                <img class="case-img" src="https://image.pollinations.ai/prompt/japanese%20high%20school%20anime%20girl,%20cute%20anime%20style,%20detailed?width=600&height=800&model=turbo&nologo=true" alt="Japanese High School Anime Girl" onerror="this.src='https://picsum.photos/600/800?random=3'">
+                <p>Anime Manga Character</p>
+            </div>
+            <div class="case-item">
+                <img class="case-img" src="https://image.pollinations.ai/prompt/cute%20chibi%20fantasy%20elf,%20kawaii%20cartoon%20style,%20big%20eyes?width=600&height=800&model=turbo&nologo=true" alt="Cute Chibi Fantasy Elf" onerror="this.src='https://picsum.photos/600/800?random=4'">
+                <p>Tabletop Game Mini Avatar</p>
+            </div>
+            <div class="case-item">
+                <img class="case-img" src="https://image.pollinations.ai/prompt/post-apocalypse%20female%20protagonist,%20tough%20warrior,%20realistic%20style?width=600&height=800&model=turbo&nologo=true" alt="Post-Apocalypse Female Protagonist" onerror="this.src='https://picsum.photos/600/800?random=5'">
+                <p>Fantasy Novel Heroine</p>
+            </div>
+            <div class="case-item">
+                <img class="case-img" src="https://image.pollinations.ai/prompt/ancient%20chinese%20wuxia%20swordsman,%20traditional%20hanfu,%20martial%20arts%20style?width=600&height=800&model=turbo&nologo=true" alt="Wuxia Swordsman Character" onerror="this.src='https://picsum.photos/600/800?random=6'">
+                <p>Ancient Martial Arts Hero</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="section">
+    <div class="container">
+        <div class="faq">
+            <h2 style="margin-bottom: 40px;">Frequently Asked Questions</h2>
+            <div class="faq-item">
+                <h4>1. Can I commercially use the generated images?</h4>
+                <p>The free public API is for personal testing only. For commercial use, please use a paid dedicated API service and confirm the official authorization terms.</p>
+            </div>
+            <div class="faq-item">
+                <h4>2. I don't know how to write prompts, what should I do?</h4>
+                <p>Click the blue template bar above the input box to auto-fill professional prompts. You can also just enter simple character features to generate.</p>
+            </div>
+            <div class="faq-item">
+                <h4>3. Why is generation slow sometimes?</h4>
+                <p>The free public API has limited server resources. It may slow down during peak hours. Please wait patiently or try again later.</p>
+            </div>
+            <div class="faq-item">
+                <h4>4. Why does generation fail?</h4>
+                <p>It may be due to network restrictions, API rate limits, or sensitive content in the prompt. You can change the description and try again.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 底部 -->
+<footer>
+    <div class="container">
+        <h3>More AI Image Creation Tools</h3>
+        <div class="footer-link">
+            <a href="#">AI Avatar Generator</a>
+            <a href="#">AI Poster Generator</a>
+            <a href="#">AI Wallpaper Maker</a>
+            <a href="#">AI Logo Creator</a>
+            <a href="#">Text To Image AI</a>
+            <a href="#">Image To Image</a>
+            <a href="#">AI Manga Colorizer</a>
+            <a href="#">AI Background Remover</a>
+            <a href="#">Watermark Remover</a>
+            <a href="#">AI Image Upscaler</a>
+        </div>
+        <p style="margin-top: 35px; font-size: 14px; opacity: 0.8;">©2026 AI Art Toolkit - Free Online AI Image Production Platform</p>
+    </div>
+</footer>
+
+<script>
+    // 一键填充模板
+    function fillTemplate() {
+        document.getElementById('prompt').value = 'young handsome chinese xianxia male cultivator, long black hair, white traditional robe, holding a sword, cold expression, mountain cloud background, highly detailed';
+    }
+
+    // 获取页面元素
+    var generateBtn = document.getElementById('generateBtn');
+    var resultArea = document.getElementById('resultArea');
+    var resultImg = document.getElementById('resultImg');
+    var loadingText = document.getElementById('loadingText');
+    var errorTip = document.getElementById('errorTip');
+    var downloadBtn = document.getElementById('downloadBtn');
+    var regenerateBtn = document.getElementById('regenerateBtn');
+
+    // 绑定点击事件
+    generateBtn.onclick = generateImage;
+    regenerateBtn.onclick = generateImage;
+
+    // 核心生成函数
+    function generateImage() {
+        var promptText = document.getElementById('prompt').value.trim();
+        var style = document.getElementById('style').value;
+        var scenario = document.getElementById('scenario').value;
+        var size = document.getElementById('size').value.split('x');
+        var width = size[0];
+        var height = size[1];
+
+        if (!promptText) {
+            alert('Please enter a character description first');
+            return;
+        }
+
+        // 重置界面，显示加载状态
+        errorTip.style.display = 'none';
+        resultArea.style.display = 'block';
+        resultImg.style.display = 'none';
+        loadingText.style.display = 'block';
+        generateBtn.disabled = true;
+        generateBtn.innerText = 'Generating...';
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+
+        // 拼接完整提示词
+        var fullPrompt = encodeURIComponent(promptText + ', ' + style + ', ' + scenario + ', masterpiece, best quality');
+        
+        // 拼接API地址
+        var imgUrl = 'https://image.pollinations.ai/prompt/' + fullPrompt + '?width=' + width + '&height=' + height + '&model=turbo&nologo=true';
+
+        // 超时兜底：15秒没加载出来，自动显示示例图
+        var timeout = setTimeout(function() {
+            showFallbackImage();
+        }, 15000);
+
+        // 创建图片对象加载
+        var tempImg = new Image();
+        
+        tempImg.onload = function() {
+            clearTimeout(timeout);
+            resultImg.src = imgUrl;
+            resultImg.style.display = 'block';
+            loadingText.style.display = 'none';
+            generateBtn.disabled = false;
+            generateBtn.innerText = 'Generate AI Character Art';
+        };
+
+        tempImg.onerror = function() {
+            clearTimeout(timeout);
+            showFallbackImage();
+        };
+
+        tempImg.src = imgUrl;
+    }
+
+    // 兜底：本地生成示例图，保证一定有结果
+    function showFallbackImage() {
+        var canvas = document.createElement('canvas');
+        canvas.width = 768;
+        canvas.height = 1024;
+        var ctx = canvas.getContext('2d');
+        
+        // 渐变背景
+        var gradient = ctx.createLinearGradient(0, 0, 0, 1024);
+        gradient.addColorStop(0, '#4285f4');
+        gradient.addColorStop(1, '#7b61ff');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 768, 1024);
+
+        // 白色文字
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('AI Character Preview', 384, 400);
+        
+        ctx.font = '20px Arial';
+        ctx.fillText('Demo sample image', 384, 450);
+        ctx.fillText('Please check your network and try again', 384, 490);
+
+        resultImg.src = canvas.toDataURL('image/png');
+        resultImg.style.display = 'block';
+        loadingText.style.display = 'none';
+        generateBtn.disabled = false;
+        generateBtn.innerText = 'Generate AI Character Art';
+        
+        errorTip.style.display = 'block';
+        errorTip.innerText = '⚠️ Network request timed out. A sample image is displayed. Please check your internet connection and try again.';
+    }
+
+    // 下载图片
+    downloadBtn.onclick = function() {
+        if (!resultImg.src) return;
+        window.open(resultImg.src, '_blank');
+    };
+</script>
+
+</body>
+</html>
