@@ -521,7 +521,7 @@
     </div>
 </section>
 
-<!-- 案例展示（全部填充对应风格示例图） -->
+<!-- 案例展示 -->
 <section class="section">
     <div class="container">
         <h2>AI Character Generated Samples</h2>
@@ -606,81 +606,94 @@
     }
 
     // 获取页面元素
-    var generateBtn = document.getElementById('generateBtn');
-    var resultArea = document.getElementById('resultArea');
-    var resultImg = document.getElementById('resultImg');
-    var loadingText = document.getElementById('loadingText');
-    var errorTip = document.getElementById('errorTip');
-    var downloadBtn = document.getElementById('downloadBtn');
-    var regenerateBtn = document.getElementById('regenerateBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const resultArea = document.getElementById('resultArea');
+    const resultImg = document.getElementById('resultImg');
+    const loadingText = document.getElementById('loadingText');
+    const errorTip = document.getElementById('errorTip');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const regenerateBtn = document.getElementById('regenerateBtn');
 
     // 绑定点击事件
-    generateBtn.onclick = generateImage;
-    regenerateBtn.onclick = generateImage;
+    generateBtn.addEventListener('click', generateImage);
+    regenerateBtn.addEventListener('click', generateImage);
+    downloadBtn.addEventListener('click', downloadImage);
 
     // 核心生成函数
-    function generateImage() {
-        var promptText = document.getElementById('prompt').value.trim();
-        var style = document.getElementById('style').value;
-        var scenario = document.getElementById('scenario').value;
-        var size = document.getElementById('size').value.split('x');
-        var width = size[0];
-        var height = size[1];
+    async function generateImage() {
+        const promptText = document.getElementById('prompt').value.trim();
+        const style = document.getElementById('style').value;
+        const scenario = document.getElementById('scenario').value;
+        const size = document.getElementById('size').value.split('x');
+        const width = size[0];
+        const height = size[1];
 
+        // 验证输入
         if (!promptText) {
-            alert('Please enter a character description first');
+            showError('Please enter a character description first');
             return;
         }
 
-        // 重置界面，显示加载状态
-        errorTip.style.display = 'none';
-        resultArea.style.display = 'block';
-        resultImg.style.display = 'none';
-        loadingText.style.display = 'block';
-        generateBtn.disabled = true;
-        generateBtn.innerText = 'Generating...';
-        resultArea.scrollIntoView({ behavior: 'smooth' });
-
-        // 拼接完整提示词
-        var fullPrompt = encodeURIComponent(promptText + ', ' + style + ', ' + scenario + ', masterpiece, best quality');
+        // 重置界面状态
+        resetUI();
         
-        // 拼接API地址
-        var imgUrl = 'https://image.pollinations.ai/prompt/' + fullPrompt + '?width=' + width + '&height=' + height + '&model=turbo&nologo=true';
+        try {
+            // 拼接完整提示词
+            const fullPrompt = encodeURIComponent(`${promptText}, ${style}, ${scenario}, masterpiece, best quality`);
+            // 拼接API地址
+            const imgUrl = `https://image.pollinations.ai/prompt/${fullPrompt}?width=${width}&height=${height}&model=turbo&nologo=true`;
 
-        // 超时兜底：15秒没加载出来，自动显示示例图
-        var timeout = setTimeout(function() {
-            showFallbackImage();
-        }, 15000);
-
-        // 创建图片对象加载
-        var tempImg = new Image();
-        
-        tempImg.onload = function() {
-            clearTimeout(timeout);
-            resultImg.src = imgUrl;
+            // 加载图片（带超时处理）
+            const image = await loadImageWithTimeout(imgUrl, 15000);
+            
+            // 显示生成的图片
+            resultImg.src = image.src;
             resultImg.style.display = 'block';
             loadingText.style.display = 'none';
+        } catch (error) {
+            // 显示兜底图片和错误信息
+            showFallbackImage();
+            showError(`⚠️ ${error.message}. A sample image is displayed. Please check your internet connection and try again.`);
+        } finally {
+            // 恢复按钮状态
             generateBtn.disabled = false;
             generateBtn.innerText = 'Generate AI Character Art';
-        };
-
-        tempImg.onerror = function() {
-            clearTimeout(timeout);
-            showFallbackImage();
-        };
-
-        tempImg.src = imgUrl;
+        }
     }
 
-    // 兜底：本地生成示例图，保证一定有结果
+    // 加载图片（带超时）
+    function loadImageWithTimeout(url, timeoutMs) {
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new Error('Network request timed out'));
+            }, timeoutMs);
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous'; // 处理跨域
+
+            img.onload = () => {
+                clearTimeout(timeout);
+                resolve(img);
+            };
+
+            img.onerror = () => {
+                clearTimeout(timeout);
+                reject(new Error('Failed to load image from server'));
+            };
+
+            img.src = url;
+        });
+    }
+
+    // 显示兜底图片
     function showFallbackImage() {
-        var canvas = document.createElement('canvas');
+        const canvas = document.createElement('canvas');
         canvas.width = 768;
         canvas.height = 1024;
-        var ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
         
         // 渐变背景
-        var gradient = ctx.createLinearGradient(0, 0, 0, 1024);
+        const gradient = ctx.createLinearGradient(0, 0, 0, 1024);
         gradient.addColorStop(0, '#4285f4');
         gradient.addColorStop(1, '#7b61ff');
         ctx.fillStyle = gradient;
@@ -699,18 +712,54 @@
         resultImg.src = canvas.toDataURL('image/png');
         resultImg.style.display = 'block';
         loadingText.style.display = 'none';
-        generateBtn.disabled = false;
-        generateBtn.innerText = 'Generate AI Character Art';
-        
-        errorTip.style.display = 'block';
-        errorTip.innerText = '⚠️ Network request timed out. A sample image is displayed. Please check your internet connection and try again.';
     }
 
     // 下载图片
-    downloadBtn.onclick = function() {
-        if (!resultImg.src) return;
-        window.open(resultImg.src, '_blank');
-    };
+    function downloadImage() {
+        if (!resultImg.src || resultImg.src.startsWith('data:image/svg+xml')) return;
+
+        // 创建下载链接
+        const link = document.createElement('a');
+        link.href = resultImg.src;
+        link.download = `ai-character-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // 显示错误信息
+    function showError(message) {
+        errorTip.style.display = 'block';
+        errorTip.innerText = message;
+        // 3秒后自动隐藏非超时类错误
+        if (!message.includes('timed out')) {
+            setTimeout(() => {
+                errorTip.style.display = 'none';
+            }, 3000);
+        }
+    }
+
+    // 重置UI状态
+    function resetUI() {
+        errorTip.style.display = 'none';
+        resultArea.style.display = 'block';
+        resultImg.style.display = 'none';
+        loadingText.style.display = 'block';
+        generateBtn.disabled = true;
+        generateBtn.innerText = 'Generating...';
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+<!-- Google Analytics 4 统计代码 -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9PXVC4P4YK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-9PXVC4P4YK');
 </script>
 
 </body>
