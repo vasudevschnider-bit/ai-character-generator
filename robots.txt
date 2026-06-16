@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ai-character-generator.cc/sitemap.xml
